@@ -14,9 +14,14 @@ export type TRequireError = {
   error: any
 }
 export type TReTryOpts = {
-  fn: (...args: any) => any
+  fn: () => any
   title?: string
   defaultValue?: any
+}
+
+export type TReTryResult = {
+  result: any
+  error?: string
 }
 
 export async function requiresTrySimport<T>(opts: TRequireOpts): Promise<T[]> {
@@ -40,8 +45,8 @@ export async function requiresTrySimport<T>(opts: TRequireOpts): Promise<T[]> {
         continue
       }
 
-      const m = await simport(modulePath)
-      requireResults.push(m.default)
+      const module = await simport(modulePath)
+      requireResults.push(module.default)
     } catch (error: any) {
       errors.push({ modulePath, error })
     }
@@ -53,9 +58,9 @@ export async function requiresTrySimport<T>(opts: TRequireOpts): Promise<T[]> {
   return requireResults
 }
 
-export function reTryCatch({ fn, title, defaultValue }: TReTryOpts): any {
+export async function reTryCatch({ fn, title, defaultValue }: TReTryOpts): Promise<TReTryResult> {
   try {
-    return { result: fn() }
+    return { result: await fn() }
   } catch (e: any) {
     return { result: defaultValue, error: `'${title}':\nERR: ${e}` }
   }
