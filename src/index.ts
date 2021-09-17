@@ -1,6 +1,7 @@
 import _ from 'lodash'
 import { createSimport } from 'simport'
 import { createRequire } from 'module'
+import path from 'path'
 
 const simport = createSimport(import.meta.url)
 const req = createRequire(import.meta.url)
@@ -64,4 +65,14 @@ export async function reTryCatch({ fn, title, defaultValue }: TReTryOpts): Promi
   } catch (e: any) {
     return { result: defaultValue, error: `'${title}':\nERR: ${e}` }
   }
+}
+
+export async function getPackageJson(appPath: string) {
+  const packageJson = (
+    await requiresTrySimport<any>({
+      modulesPaths: [path.join(appPath, 'package.json')]
+    })
+  )[0]
+
+  return packageJson
 }
